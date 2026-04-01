@@ -53,29 +53,42 @@ async function updateData() {
   try {
     console.log("⏳ Lade Daten von API-Football...");
 
-    // Fixtures
     const fixturesRes = await fetchAPI(
       `https://v3.football.api-sports.io/fixtures?league=${LEAGUE_ID}&season=${SEASON}`
     );
 
-    // Standings / Tabellen
     const standingsRes = await fetchAPI(
       `https://v3.football.api-sports.io/standings?league=${LEAGUE_ID}&season=${SEASON}`
     );
 
-    // Daten zusammenführen
+    const fixtures = fixturesRes.response || [];
+    const standingsRaw = standingsRes.response || [];
+
     const data = {
       updated: new Date().toISOString(),
-      fixtures: simplifyFixtures(fixturesRes.response),
-      standings: simplifyStandings(standingsRes.response)
+      fixtures: fixtures.length ? simplifyFixtures(fixtures) : [],
+      standings: standingsRaw.length ? simplifyStandings(standingsRaw) : [],
+      error: fixtures.length === 0 ? "Keine API-Daten verfügbar" : null
     };
 
-    // JSON speichern
     fs.writeFileSync("wm2026.json", JSON.stringify(data, null, 2));
-    console.log("✅ JSON erfolgreich erstellt: wm2026.json");
+
+    console.log("✅ JSON erfolgreich erstellt");
+    console.log("Fixtures:", fixtures.length);
+    console.log("Standings:", standingsRaw.length);
 
   } catch (err) {
     console.error("❌ Fehler beim Update:", err.message);
+
+    // 🔥 Fallback JSON erstellen (wichtig!)
+    const fallback = {
+      updated: new Date().toISOString(),
+      fixtures: [],
+      standings: [],
+      error: err.message
+    };
+
+    fs.writeFileSync("wm2026.json", JSON.stringify(fallback, null, 2));
   }
 }
 
