@@ -1,0 +1,43 @@
+name: Update WM2026 JSON
+
+# Wann der Workflow ausgelöst wird
+on:
+  schedule:
+    # Alle 15 Minuten
+    - cron: "*/15 * * * *"
+  workflow_dispatch: # Ermöglicht manuelles Starten
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Repository auschecken
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2. Node.js Setup
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    # 3. Abhängigkeiten installieren
+    - name: Install dependencies
+      run: npm install
+
+    # 4. JSON aktualisieren
+    - name: Update WM2026 JSON
+      env:
+        API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+      run: node update.js
+
+    # 5. Änderungen committen & pushen
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add wm2026.json
+        git commit -m "Automatisches Update der WM2026 JSON"
+        git push
+      continue-on-error: true
