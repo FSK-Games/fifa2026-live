@@ -9,6 +9,9 @@ jobs:
   update-json:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # 🔥 WICHTIG für git push
+
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -28,6 +31,13 @@ jobs:
       env:
         API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
       run: node update.js
+
+    - name: Check if JSON exists
+      run: |
+        if [ ! -f wm2026.json ]; then
+          echo "❌ wm2026.json wurde nicht erstellt!"
+          exit 1
+        fi
 
     - name: Commit & push if changed
       run: |
