@@ -1,0 +1,14 @@
+{
+  "name": "wm2026-cache",
+  "version": "1.0.0",
+  "description": "Automatisches Update der FIFA WM 2026 Daten via API-Football für Weebly",
+  "main": "update.js",
+  "scripts": {
+    "start": "node update.js"
+  },
+  "author": "FSK-Games",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
